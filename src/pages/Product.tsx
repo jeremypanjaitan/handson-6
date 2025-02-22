@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "../utils/AxiosInstance";
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: number;
   title: string;
   description: string;
   price: number;
-  images: string[]
+  thumbnail: string
 }
 
 interface ProductData {
@@ -39,6 +40,7 @@ const ProductSkeleton = () => {
 
 const Product = () => {
   const getProductList = useQuery({ queryKey: ["productList"], queryFn: fetchProductList })
+  const navigate = useNavigate();
   return (
     <div className="container mx-auto px-4">
       <div className="bg-white">
@@ -49,10 +51,10 @@ const Product = () => {
               <ProductSkeleton key={index} />
             ))) : (
               getProductList.data?.data.products.map((product) => (
-                <div key={product.id} className="group relative">
+                <div key={product.id} className="group relative" onClick={() => navigate(`/product/${product.id}`)}>
                   <img
                     alt={product.title}
-                    src={product.images[0]}
+                    src={product.thumbnail}
                     className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
                   />
                   <div className="mt-4 flex justify-between">
@@ -65,7 +67,7 @@ const Product = () => {
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">{product.description}</p>
                     </div>
-                    <p className="text-sm font-medium text-gray-900">{product.price}</p>
+                    <p className="text-sm font-medium text-gray-900">{product.price}$</p>
                   </div>
                 </div>
               ))
