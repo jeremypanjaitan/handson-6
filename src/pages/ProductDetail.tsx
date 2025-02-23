@@ -165,9 +165,9 @@ const ProductDetail = () => {
       ) : (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
           {deleteProductMutation.isPending && (
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
-              <div className="flex items-center bg-white/90 px-6 py-3 rounded-lg shadow-lg">
-                <span className="text-2xl mr-4 text-gray-800">Deleting...</span>
+            <div className="absolute inset-0 bg-white bg-opacity-60 z-10 flex items-center justify-center">
+              <div className="flex items-center">
+                <span className="text-3xl mr-4">Deleting...</span>
                 <svg
                   className="animate-spin h-5 w-5 text-gray-600"
                   xmlns="http://www.w3.org/2000/svg"
