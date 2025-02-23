@@ -157,3 +157,81 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
 };
 
 export default ProductForm;
+import { UseMutateFunction } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+
+export interface ProductFormInput {
+  title: string;
+  description: string;
+  price: number;
+  thumbnail: string;
+}
+
+interface ProductFormProps {
+  isEdit: boolean;
+  mutateFn: UseMutateFunction<any, unknown, ProductFormInput, unknown>;
+}
+
+const ProductForm = ({ isEdit, mutateFn }: ProductFormProps) => {
+  const { register, handleSubmit } = useForm<ProductFormInput>();
+
+  const onSubmit = (data: ProductFormInput) => {
+    mutateFn(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md">
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Title
+        </label>
+        <input
+          {...register("title")}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="text"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Description
+        </label>
+        <textarea
+          {...register("description")}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Price
+        </label>
+        <input
+          {...register("price", { valueAsNumber: true })}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="number"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Thumbnail URL
+        </label>
+        <input
+          {...register("thumbnail")}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="text"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        {isEdit ? "Update" : "Add"} Product
+      </button>
+    </form>
+  );
+};
+
+export default ProductForm;
