@@ -50,7 +50,7 @@ interface DeletedProduct extends ProductDetail {
   deletedOn: string;
 }
 
-const fetchProductDetail = async (id: string | undefined) => {
+export const fetchProductDetail = async (id: string | undefined) => {
   return await axios.get<ProductDetail>(`/product/${id}`);
 };
 
@@ -144,7 +144,7 @@ const ProductDetailSkeleton = () => {
 const ProductDetail = () => {
   const { id } = useParams();
   const getProductDetail = useQuery({
-    queryKey: ["productDetail"],
+    queryKey: ["productDetail", id],
     queryFn: () => fetchProductDetail(id)
   });
   const deleteProductMutation = useMutation({
@@ -342,7 +342,12 @@ const ProductDetail = () => {
             </svg>
           </button>
           <div className="absolute bottom-14 right-0 bg-white rounded-lg shadow-lg w-32 hidden group-focus-within:block">
-            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+            <button
+              onClick={() => {
+                navigate("edit");
+              }}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+            >
               Edit
             </button>
             <button

@@ -1,10 +1,11 @@
 import { UseMutateFunction } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface ProductFormProps {
   isEdit: boolean;
   mutateFn: UseMutateFunction<any, Error, ProductFormInput, unknown>;
+  defaultInputData?: ProductFormInput;
 }
 
 export type ProductFormInput = {
@@ -19,9 +20,24 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors }
   } = useForm<ProductFormInput>();
+  useEffect(() => {
+    if (props.defaultInputData) {
+      setValue("title", props.defaultInputData.title);
+      setValue("description", props.defaultInputData.description);
+      setValue("discountPercentage", props.defaultInputData.discountPercentage);
+      setValue("category", props.defaultInputData.category);
+      setValue("price", props.defaultInputData.price);
+    }
+  }, [props.defaultInputData]);
   const onSubmit: SubmitHandler<ProductFormInput> = (data) => {
+    if (props.isEdit) {
+      if (!confirm("Are you sure want to update product data ? ")) {
+        return;
+      }
+    }
     props.mutateFn(data);
   };
 
@@ -82,6 +98,7 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
               "shadow appearance-none border rounded-r-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline " +
               (errors.price && "border-red-500")
             }
+            step="0.01" min="0"
             placeholder="0.00"
             {...register("price")}
           />
@@ -123,7 +140,13 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
             {...register("discountPercentage")}
             type="number"
             id="discountPercentage"
-            className={"shadow appearance-none border rounded-l-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" + (errors.category && "border-red-500")}
+            className={
+              "shadow appearance-none border rounded-l-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" +
+              (errors.category && "border-red-500")
+            }
+            step="0.01"
+            min="0"
+            max="100"
             placeholder="0"
           />
           <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 rounded-r-md border border-l-0 border-gray-300">
