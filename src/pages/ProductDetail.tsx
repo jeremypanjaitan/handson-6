@@ -165,7 +165,7 @@ const ProductDetail = () => {
       ) : (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
           {deleteProductMutation.isPending && (
-            <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-white bg-opacity-60 z-10 flex items-center justify-center">
               <div className="flex items-center">
                 <span className="text-3xl mr-4">Deleting...</span>
                 <svg
