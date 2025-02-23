@@ -3,8 +3,8 @@ import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 interface ProductFormProps {
-  isEdit: Boolean;
-  mutateFn:  MutateFunction<ProductFormInput>
+  isEdit: boolean;
+  mutateFn: UseMutateFunction<any, Error, ProductFormInput, unknown>;
 }
 
 export type ProductFormInput = {
@@ -21,10 +21,12 @@ const ProductForm: React.FC<ProductFormProps> = (props) => {
     handleSubmit,
     formState: { errors }
   } = useForm<ProductFormInput>();
-  const onSubmitAdd: SubmitHandler<ProductFormInput> = (data) => console.log(data);
-  const onSubmitEdit: SubmitHandler<ProductFormInput> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<ProductFormInput> = (data) => {
+    props.mutateFn(data);
+  };
+
   return (
-    <form onSubmit={props.isEdit ? handleSubmit(onSubmitAdd) : handleSubmit(onSubmitEdit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
         <label className="block text-gray-700 font-bold mb-2">Title</label>
         <input
