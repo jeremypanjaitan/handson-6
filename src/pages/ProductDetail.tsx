@@ -1,6 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "../utils/AxiosInstance";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 interface ProductDetail {
   id: number;
@@ -44,10 +45,18 @@ interface Review {
   reviewerEmail: string;
 }
 
+interface DeletedProduct extends ProductDetail {
+  isDeleted: Boolean;
+  deletedOn: string;
+}
 
 const fetchProductDetail = async (id: string | undefined) => {
-  return await axios.get<ProductDetail>(`/product/${id}`)
-}
+  return await axios.get<ProductDetail>(`/product/${id}`);
+};
+
+const deleteProduct = async (id: string | undefined) => {
+  return await axios.delete<DeletedProduct>(`product/${id}`);
+};
 
 const ProductDetailSkeleton = () => {
   return (
@@ -130,16 +139,30 @@ const ProductDetailSkeleton = () => {
         </div>
       </div>
     </div>
-
-  )
-}
+  );
+};
 const ProductDetail = () => {
   const { id } = useParams();
-  const getProductDetail = useQuery({ queryKey: ["productDetail"], queryFn: () => fetchProductDetail(id) })
-  const product: ProductDetail | undefined = getProductDetail.data?.data
+  const getProductDetail = useQuery({
+    queryKey: ["productDetail"],
+    queryFn: () => fetchProductDetail(id)
+  });
+  const deleteProductMutation = useMutation({
+    mutationFn: () => deleteProduct(id)
+  });
+  const product: ProductDetail | undefined = getProductDetail.data?.data;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (deleteProductMutation.isSuccess) {
+      navigate("/product", { replace: true });
+    }
+  }, [deleteProductMutation.isSuccess]);
   return (
     <div>
-      {getProductDetail.isFetching || product === undefined ? (<ProductDetailSkeleton />) : (
+      {getProductDetail.isFetching || product === undefined ? (
+        <ProductDetailSkeleton />
+      ) : (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Product Image */}
@@ -154,16 +177,24 @@ const ProductDetail = () => {
             {/* Product Details */}
             <div className="space-y-4">
               {/* Title */}
-              <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {product.title}
+              </h1>
 
               {/* Description */}
               <p className="text-gray-600">{product.description}</p>
 
               {/* Price and Discount */}
               <div className="flex items-center space-x-2">
-                <p className="text-2xl font-bold text-gray-900">${product.price.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${product.price.toFixed(2)}
+                </p>
                 <p className="text-sm text-red-600 line-through">
-                  ${((product.price / (1 - product.discountPercentage / 100)).toFixed(2))}
+                  $
+                  {(
+                    product.price /
+                    (1 - product.discountPercentage / 100)
+                  ).toFixed(2)}
                 </p>
                 <p className="text-sm text-green-600">
                   {product.discountPercentage.toFixed(2)}% off
@@ -185,7 +216,8 @@ const ProductDetail = () => {
 
               {/* Stock Status */}
               <p className="text-gray-600">
-                <span className="font-bold">Stock Status:</span> {product.availabilityStatus}
+                <span className="font-bold">Stock Status:</span>{" "}
+                {product.availabilityStatus}
               </p>
 
               {/* Brand and SKU */}
@@ -204,27 +236,33 @@ const ProductDetail = () => {
                   <span className="font-bold">Weight:</span> {product.weight} oz
                 </p>
                 <p className="text-gray-600">
-                  <span className="font-bold">Dimensions:</span> {product.dimensions.width} x {product.dimensions.height} x {product.dimensions.depth} mm
+                  <span className="font-bold">Dimensions:</span>{" "}
+                  {product.dimensions.width} x {product.dimensions.height} x{" "}
+                  {product.dimensions.depth} mm
                 </p>
               </div>
 
               {/* Warranty and Shipping Information */}
               <div className="flex space-x-4">
                 <p className="text-gray-600">
-                  <span className="font-bold">Warranty:</span> {product.warrantyInformation}
+                  <span className="font-bold">Warranty:</span>{" "}
+                  {product.warrantyInformation}
                 </p>
                 <p className="text-gray-600">
-                  <span className="font-bold">Shipping:</span> {product.shippingInformation}
+                  <span className="font-bold">Shipping:</span>{" "}
+                  {product.shippingInformation}
                 </p>
               </div>
 
               {/* Return Policy and Minimum Order Quantity */}
               <div className="flex space-x-4">
                 <p className="text-gray-600">
-                  <span className="font-bold">Return Policy:</span> {product.returnPolicy}
+                  <span className="font-bold">Return Policy:</span>{" "}
+                  {product.returnPolicy}
                 </p>
                 <p className="text-gray-600">
-                  <span className="font-bold">Minimum Order Quantity:</span> {product.minimumOrderQuantity}
+                  <span className="font-bold">Minimum Order Quantity:</span>{" "}
+                  {product.minimumOrderQuantity}
                 </p>
               </div>
             </div>
@@ -249,7 +287,8 @@ const ProductDetail = () => {
                   </div>
                   <p className="text-gray-800">{review.comment}</p>
                   <p className="text-gray-500 text-sm mt-1">
-                    - {review.reviewerName} on {new Date(review.date).toLocaleDateString()}
+                    - {review.reviewerName} on{" "}
+                    {new Date(review.date).toLocaleDateString()}
                   </p>
                 </div>
               ))}
@@ -260,19 +299,40 @@ const ProductDetail = () => {
       <div className="fixed bottom-4 right-4 z-50">
         <div className="relative group">
           <button className="bg-blue-500 text-white rounded-full p-3 shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+              />
             </svg>
           </button>
           <div className="absolute bottom-14 right-0 bg-white rounded-lg shadow-lg w-32 hidden group-focus-within:block">
-            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100">Edit</button>
-            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100">Delete</button>
+            <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+              Edit
+            </button>
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+              onClick={() => {
+                if (confirm("Are you sure want to delete this product ? ")) {
+                  deleteProductMutation.mutate();
+                }
+              }}
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
-export default ProductDetail
+export default ProductDetail;
