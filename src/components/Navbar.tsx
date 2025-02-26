@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/16/solid"
 import { NavLink } from "react-router-dom"
 
 const navigation = [
 	{ name: 'Product', to: '/', current: true },
+=======
+import { Disclosure, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
+import { BellIcon } from "@heroicons/react/16/solid"
+import { NavLink } from "react-router-dom"
+
+const navigation = [
+	{ name: 'Product', to: '/product', current: true },
+>>>>>>> 306bc0e (commit coba)
 	{ name: 'Recipes', to: '/recipes', current: false },
 	{ name: 'Carts', to: '/carts', current: false },
 	{ name: 'Post', to: '/posts', current: false },
