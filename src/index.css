@@ -1,8 +1,17 @@
 @import "tailwindcss";
+<<<<<<< HEAD
+=======
+@tailwind "components";
+@tailwind "utilities";
+>>>>>>> 306bc0e (commit coba)
 
 /* Plugins */
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
 /* Class based dark mode */
+<<<<<<< HEAD
 @variant dark (&:where(.dark, .dark *));
+=======
+@variant dark (&:where(.dark, .dark *));
+>>>>>>> 306bc0e (commit coba)
